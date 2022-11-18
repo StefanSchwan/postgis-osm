@@ -1,8 +1,12 @@
 #!/bin/bash
 set -e
-
-createuser --no-superuser --no-createrole --createdb osm
-createdb -E UTF8 -O osm osm
-psql -d osm -c "CREATE EXTENSION postgis;"
-psql -d osm -c "CREATE EXTENSION hstore;" # only required for hstore support
-echo "ALTER USER osm WITH PASSWORD 'osm';" |psql -d osm
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+	CREATE USER ${PGUSER};
+	CREATE DATABASE ${PGDATABASE};
+	GRANT ALL PRIVILEGES ON DATABASE ${PGDATABASE} TO $POSTGRES_USER;
+EOSQL
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+	CREATE EXTENSION postgis;
+	CREATE EXTENSION hstore;
+	ALTER USER osm WITH PASSWORD '${PGPASSWORD}';
+EOSQL
