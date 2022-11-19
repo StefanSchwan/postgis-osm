@@ -11,6 +11,7 @@ services:
       - .env
     ports:
       - "5432:5432"
+    command: postgres -c shared_buffers=1GB -c work_mem=50MB -c maintenance_work_mem=5GB -c wal_level=minimal -c checkpoint_timeout=60min -c max_wal_size=5GB -c checkpoint_completion_target=0.9 -c max_wal_senders=0 
 
   adminer:
     image: adminer

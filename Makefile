@@ -5,10 +5,13 @@ MAKEFLAGS += --silent
 DC = docker-compose
 
 install:
-		mkdir data && docker-compose up 
+		mkdir data && ${DC} up 
 
 uninstall:
-		docker-compose down --rmi all -v && sudo rm -rf data/
-		
+		${DC} down --rmi all -v && sudo rm -rf data/
+
 reset:
-		docker-compose down --rmi all -v && sudo rm -rf data/
+		${DC} down -v && sudo rm -rf data/
+
+start:
+		${DC} up
