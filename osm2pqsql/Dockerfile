@@ -1,89 +1,32 @@
-FROM alpine:3.17
+FROM ubuntu:latest
 
-ARG O2P_VERSION="1.7.2"
-ARG OST_VERSION="v1.14.0"
-ARG LOS_VERSION="v2.18.0"
-ARG PRZ_VERSION="v1.7.1"
-ARG PROJ_VERSION="9.1.0"
-ARG PRJ_VERSION="v2.1.0-beta3"
-
-
-RUN apk --update-cache add \
-        cmake \
-        make \
-        g++ \
-        boost-dev \
-        expat-dev \
-        bzip2-dev \
-        zlib-dev \
-        libpq \
-        proj \
-        proj-dev \
-        lua5.3-dev \
-        postgresql-dev \
-        git \
-        expat-dev \
-        gdal-dev \
-        geos-dev \
-        sparsehash \
-        zlib-dev \
-        boost-dev \
-        bzip2-dev \
-        lz4-dev \
-        py3-psycopg2 \
-        wget \
-        sqlite \
-        sqlite-libs
-
-RUN git clone -b ${PRJ_VERSION} --single-branch https://luajit.org/git/luajit.git && \
-        cd luajit && \
-        make && \
-        make install
-
-RUN wget https://download.osgeo.org/proj/proj-${PROJ_VERSION}.tar.gz && \
-        tar xfv proj-${PROJ_VERSION}.tar.gz && \
-        cd proj-${PROJ_VERSION} && \
-        mkdir build && \
-        cd build && \
-        cmake .. && \ 
-        cmake --build . && \
-        cmake --build . --target install
-
-RUN git clone -b ${PRZ_VERSION} --single-branch --depth 1 https://github.com/mapbox/protozero.git && \
-        cd protozero && \
-        mkdir build && \
-        cd build && \
-        cmake .. && \
-        make && \
-        make install
-
-RUN git clone -b ${LOS_VERISON} --single-branch --depth 1 https://github.com/osmcode/libosmium.git && \
-        cd libosmium && \
-         mkdir build && \
-         cd build && \
-         cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DBUILD_EXAMPLES=OFF .. && \
-         make
-
-RUN git clone -b ${OST_VERSION} --single-branch --depth 1 https://github.com/osmcode/osmium-tool.git && \ 
-        cd osmium-tool && \
-        mkdir build && \
-        cd build && \
-        cmake -DCMAKE_BUILD_TYPE=MinSizeRel .. && \
-        make && make install 
-
-RUN git clone -b ${O2P_VERSION} --single-branch --depth 1 https://github.com/openstreetmap/osm2pgsql.git && \
-        cd osm2pgsql && \
-        mkdir build && \
-        cd build && \
-        cmake -D WITH_LUAJIT=ON .. && \
-        make && make install
-
-
-RUN apk del \
-        cmake \
-        make \
-        g++ \
-        git 
-
-ENTRYPOINT ["osm2pgsql"]
-
+RUN apt-get update 
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata
+RUN apt-get install \
+	make \
+	cmake \
+	g++ \
+	libboost-dev \
+	libboost-system-dev \
+	libboost-filesystem-dev \
+	libexpat1-dev \
+	zlib1g-dev \
+	libluajit-5.1-dev \
+	libbz2-dev \
+	libpq-dev \
+	libproj-dev \
+	lua5.3 \
+	liblua5.3-dev \
+	pandoc \
+	git \
+	python3 \
+	python3-pip -y 
+RUN git clone https://github.com/openstreetmap/osm2pgsql.git \
+	&& cd osm2pgsql \
+	&& mkdir build \
+	&& cd build \
+	&& cmake -D WITH_LUAJIT=ON -D CMAKE_BUILD_TYPE=Release .. \
+	&& make \
+	&& make install \
+	&& pip install osmium \
+	&& pip install psycopg2
