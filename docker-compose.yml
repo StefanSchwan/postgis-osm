@@ -23,13 +23,11 @@ services:
       - db
 
   osm2pqsql:
-    build:
-      context: ./osm2pqsql
+    image: cygnusolor/osm2pqsql:latest
+    # build:
+    #   context: ./osm2pqsql
     volumes: 
       - planet:/planet
-    environment:
-      - TZ=America/New_York
-      - DEBIAN_FRONTEND=noninteractive
     env_file:
        - .env
 volumes:

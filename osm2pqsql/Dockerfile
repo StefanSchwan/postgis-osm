@@ -21,6 +21,7 @@ RUN apt-get install \
 	git \
 	python3 \
 	python3-pip -y 
+
 RUN git clone https://github.com/openstreetmap/osm2pgsql.git \
 	&& cd osm2pgsql \
 	&& mkdir build \
@@ -30,3 +31,8 @@ RUN git clone https://github.com/openstreetmap/osm2pgsql.git \
 	&& make install \
 	&& pip install osmium \
 	&& pip install psycopg2
+
+RUN apt-get remove make \
+	cmake \
+	g++ \
+    git -y
